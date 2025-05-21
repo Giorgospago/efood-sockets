@@ -37,6 +37,22 @@ async function main() {
         res.json({ message: 'Hello World!' });
     });
 
+    app.post('/send-to-client', (req, res) => {
+        const { socket_ids, channel, data } = req.body;
+
+        console.log('send-to-client', req.body);
+
+        if (!socket_ids?.length || !channel || !data) {
+            return res.status(400).json({ message: 'Invalid request' });
+        }
+
+        for (let socket_id of socket_ids) {
+            io.to(socket_id).emit(channel, data);
+        }
+
+        return res.json({ message: 'Message sent' });
+    });
+
     io.on('connection', (socket) => {
         console.log('a user connected ' + socket.id);
 
